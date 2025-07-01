@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>বাংলাদেশি ফোন নাম্বার জেনারেটর</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .glassmorphism {
+      background-color: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .bg-gradient-primary {
+      background-image: linear-gradient(to right, #2196f3, #21cbf3);
+    }
+    .text-gradient-primary {
+      background-image: linear-gradient(to right, #2196f3, #21cbf3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 p-0 m-0 min-h-screen flex flex-col">
+
+  <main class="flex-grow flex items-center justify-center p-0 w-full h-screen">
+    <div class="card glassmorphism p-6 md:p-8 rounded-none shadow-xl flex flex-col justify-between w-full max-w-full h-full">
+      
+      <div class="text-center mb-6">
+        <h1 class="text-gradient-primary text-4xl md:text-5xl font-bold mb-2">📱 ফোন নাম্বার জেনারেটর</h1>
+        <p class="text-lg md:text-xl">বাংলাদেশের র‍্যান্ডম মোবাইল নাম্বার বানাও এক ক্লিকে!</p>
+      </div>
+
+      <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-6 px-2 md:px-0">
+        <input type="number" id="amount" min="1" max="100" value="10" placeholder="নাম্বার সংখ্যা"
+               class="p-3 rounded-xl border border-gray-300 text-center text-lg w-full md:w-28 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300" />
+
+        <select id="operator" class="p-3 rounded-xl border border-gray-300 text-lg w-full md:w-40 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300">
+          <option value="all">সব অপারেটর</option>
+          <option value="gp">GP</option>
+          <option value="banglalink">Banglalink</option>
+          <option value="robi">Robi</option>
+          <option value="airtel">Airtel</option>
+          <option value="teletalk">Teletalk</option>
+        </select>
+
+        <button onclick="generateNumbers()"
+                class="bg-gradient-primary text-white px-6 py-3 rounded-xl text-lg font-semibold cursor-pointer w-full md:w-auto
+                       hover:scale-105 hover:shadow-lg transition duration-300 ease-in-out transform">
+          জেনারেট
+        </button>
+        <button onclick="copyNumbers()"
+                class="bg-gradient-primary text-white px-6 py-3 rounded-xl text-lg font-semibold cursor-pointer w-full md:w-auto
+                       hover:scale-105 hover:shadow-lg transition duration-300 ease-in-out transform">
+          কপি
+        </button>
+      </div>
+
+      <textarea id="output" readonly class="bg-white border-2 border-dashed border-gray-300 p-5 text-lg leading-relaxed rounded-xl
+                min-h-[150px] overflow-auto shadow-inner flex-grow w-full resize-none mx-2 md:mx-0">এখানে নাম্বার আসবে...</textarea>
+
+    <footer class="mt-6 text-center text-gray-500 text-sm select-none">
+  © <span id="year"></span> Salman Rahman
+</footer>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-lg text-white hidden z-50 transition-all duration-300"></div>
+
+  <script>
+    const operatorPrefixes = {
+      all: ['013', '014', '015', '016', '017', '018', '019'],
+      gp: ['013', '017'],
+      banglalink: ['014', '019'],
+      robi: ['018'],
+      airtel: ['016'],
+      teletalk: ['015']
+    };
+
+    function generateNumbers() {
+      const amount = parseInt(document.getElementById('amount').value);
+      const selectedOperator = document.getElementById('operator').value;
+      const validPrefixes = operatorPrefixes[selectedOperator] || operatorPrefixes.all;
+      let output = '';
+
+      if (isNaN(amount) || amount < 1 || amount > 100) {
+        showToast("⚠️ ১ থেকে ১০০ এর মধ্যে নাম্বার দিন!", "bg-yellow-500");
+        return;
+      }
+
+      for (let i = 0; i < amount; i++) {
+        const prefix = validPrefixes[Math.floor(Math.random() * validPrefixes.length)];
+        let number = '';
+        for (let j = 0; j < 8; j++) {
+          number += Math.floor(Math.random() * 10);
+        }
+        output += `+88${prefix}${number}\n`;
+      }
+
+      document.getElementById('output').value = output;
+      showToast("✅ নাম্বার তৈরি হয়েছে!", "bg-blue-600");
+    }
+
+    function copyNumbers() {
+      const text = document.getElementById('output').value;
+
+      if (text.trim() === '' || text === 'এখানে নাম্বার আসবে...') {
+        showToast("⚠️ আগে কিছু নাম্বার জেনারেট করুন!", "bg-yellow-500");
+        return;
+      }
+
+      try {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast("✅ কপি করা হয়েছে!", "bg-green-600");
+        }).catch(() => {
+          const textarea = document.getElementById('output');
+          textarea.select();
+          if(document.execCommand('copy')) {
+            showToast("✅ কপি করা হয়েছে!", "bg-green-600");
+          } else {
+            showToast("❌ কপি করতে সমস্যা হয়েছে!", "bg-red-600");
+          }
+        });
+      } catch (err) {
+        showToast("❌ কপি করতে সমস্যা হয়েছে!", "bg-red-600");
+      }
+    }
+
+    function showToast(message, colorClass = "bg-green-600") {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-lg text-white z-50 ${colorClass}`;
+      toast.classList.remove('hidden');
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2500);
+    }
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+  </script>
+
+</body>
+</html>
